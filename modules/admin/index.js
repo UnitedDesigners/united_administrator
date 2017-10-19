@@ -20,6 +20,22 @@ function report(req, res) {
   }).catch(err => console.error(err));
 }
 
+function raccoon(req, res) {
+  if (req.body.text.indexOf('#') !== -1) {
+    slack.chat.postMessage({
+      token: process.env.SLACK_OAUTH_TOKEN,
+      channel: req.body.channel_id,
+      text: `:raccoon: ${req.body.text}`,
+      parse: 'full',
+    }).then(() => {
+      res.status(200).end();
+    }).catch(err => console.error(err));
+  } else {
+    res.send('/raccoon must include a channel name');
+  }
+}
+
 module.exports = (router) => {
   router.post('/slack/report', report);
+  router.post('/slack/raccoon', raccoon);
 };
