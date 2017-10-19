@@ -1,0 +1,27 @@
+{
+  "name": "United_Designers",
+  "version": "1.0.0",
+  "description": "Infrastructure for United Designers",
+  "main": "index.js",
+  "author": "George Sumpster <gsumpster@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@slack/client": "^3.14.1",
+    "@slack/events-api": "^1.0.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "slack": "^9.0.5"
+  },
+  "devDependencies": {
+    "cz-emoji": "^1.0.0",
+    "eslint": "^4.9.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.7.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-emoji"
+    }
+  }
+}
