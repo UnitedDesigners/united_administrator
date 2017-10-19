@@ -10,10 +10,12 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
 
 app.use('/slack/events', slackEvents.expressMiddleware());
 require('./modules/welcome/index.js')(slackEvents);
+require('./modules/admin/index.js')(app);
 
 slackEvents.on('error', console.error);
 
