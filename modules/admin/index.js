@@ -12,6 +12,14 @@ function report(req, res) {
         text: req.body.text,
         footer: `#${req.body.channel_name}`,
         ts: Date.now() / 1000,
+        actions: [
+          {
+            name: 'flag_report',
+            text: ':triangular_flag_on_post:',
+            type: 'button',
+            value: req.body.user_id,
+          },
+        ],
       },
     ],
     parse: 'full',
