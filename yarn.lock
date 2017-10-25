@@ -1773,7 +1773,7 @@ through@2, through@^2.3.6:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
 
-tiny-json-http@^5.1.0:
+tiny-json-http@^5.1.0, tiny-json-http@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/tiny-json-http/-/tiny-json-http-5.1.2.tgz#86c5c088108a945307f4525ee49adcb414300599"
 

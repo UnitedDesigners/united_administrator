@@ -1,4 +1,5 @@
 const validate = require('validate.js');
+const tiny = require('tiny-json-http');
 const notify = require('./notify');
 const queries = require('./queries');
 
@@ -24,15 +25,23 @@ const formConstraints = {
 
 function newApplication(req, res, pool) {
   validate.async(req.body, formConstraints)
-    .then(pool.query(queries.insert, [
-      req.body.name,
-      req.body.email,
-      req.body.location,
-      req.body.field,
-      req.body.portfolio,
-      req.body.comments,
+    .then((success, error) => {
+      if (success) {
+        return pool.query(queries.insert, [
+          req.body.name,
+          req.body.email,
+          req.body.location,
+          req.body.field,
+          req.body.portfolio,
+          req.body.comments,
+        ]).catch((e) => { throw e; });
+      }
+      throw error;
+    })
+    .then(application => Promise.all([
+      res.status(200).end(),
+      notify(application.rows[0]),
     ]))
-    .then(application => notify(application))
     .catch((e) => {
       if (e instanceof Error) {
         res.status(500).end();
@@ -42,18 +51,53 @@ function newApplication(req, res, pool) {
     });
 }
 
-module.exports = (router, pool) => {
-  router.post('/applications/submit', (req, res) => newApplication(req, res, pool));
+function respondApplication(req, res, pool) {
+  pool.query(queries.update, [req.body.callback_id, req.body.actions[0].value, req.body.user.id])
+    .then((application) => {
+      if (req.body.actions[0].value === true) {
+        return new Promise((resolve, reject) => {
+          tiny.post('https://slack.com/api/users.admin.invite').form({ token: process.env.SLACK_ADMIN_TOKEN, email: application.rows[0].email }, (err, result) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(result);
+          });
+        });
+      }
+      return false;
+    })
+    .then(() => {
+      const orgAttachments = req.body.original_message.attachments;
+      orgAttachments[0].actions = [];
+      if (req.body.actions[0].value === true) {
+        orgAttachments[1] = { fallback: `${req.body.user.name} has accepted this application.`, text: `${req.body.user.name} has accepted this application.` };
+      } else {
+        orgAttachments[1] = { fallback: `${req.body.user.name} has denied this application.`, text: `${req.body.user.name} has denied this application.` };
+      }
+      res.send({ response_type: 'in_channel', replace_original: true, attachments: orgAttachments });
+    });
+}
 
-  pool.query(queries.init);
+module.exports = {
+  init: (router, pool) => {
+    router.post('/applications/submit', (req, res) => newApplication(req, res, pool));
 
-  // Define uniqueEmail validator
-  validate.validators.uniqueEmail = value => new validate.Promise((resolve, reject) => {
-    pool.query(queries.uniqueEmail, [value])
-      .then(res => (res.rows.length > 0 ? resolve('has already been used to apply.') : resolve()))
-      .catch((e) => {
-        console.log(e.stack);
-        reject();
-      });
-  });
+    pool.query(queries.init).catch((e) => { throw e; });
+
+    // Define uniqueEmail validator
+    validate.validators.uniqueEmail = value => new Promise((resolve) => {
+      pool.query(queries.uniqueEmail, [value])
+        .then((res) => {
+          if (res.rowCount > 0) {
+            resolve('has already been used to apply.');
+          }
+          resolve();
+        })
+        .catch((e) => {
+          console.log(e.stack);
+          resolve(e);
+        });
+    });
+  },
+  respondApplication,
 };

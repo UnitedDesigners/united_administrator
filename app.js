@@ -16,8 +16,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/slack/events', slackEvents.expressMiddleware());
-require('./modules/welcome/index.js')(slackEvents);
-require('./modules/admin/index.js')(app);
+
+require('./interactive')(app, pool);
+
+require('./modules/applications').init(app, pool);
+require('./modules/welcome')(slackEvents);
+require('./modules/admin')(app);
 
 slackEvents.on('error', console.error);
 

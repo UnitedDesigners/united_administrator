@@ -5,7 +5,7 @@ function constructMessage(form) {
     {
       fallback: 'New Application Recieved!',
       title: 'Application to United Designers',
-      callback_id: form.email,
+      callback_id: form.id,
       fields: [
         {
           title: 'Name',
@@ -35,18 +35,18 @@ function constructMessage(form) {
       ],
       actions: [
         {
-          name: 'application',
+          name: 'application_response',
           text: 'Accept',
           style: 'primary',
           type: 'button',
-          value: 'accept',
+          value: true,
         },
         {
-          name: 'application',
+          name: 'application_response',
           text: 'Deny',
           style: 'danger',
           type: 'button',
-          value: 'deny',
+          value: false,
         },
       ],
     },
@@ -59,10 +59,8 @@ module.exports = formData => new Promise((resolve, reject) => {
     channel: 'applications',
     text: '',
     attachments: constructMessage(formData),
-  }, (err, data) => {
+  }, (err) => {
     if (err) { reject(err); }
-    if (data) {
-      resolve(data);
-    }
+    resolve();
   });
 });
