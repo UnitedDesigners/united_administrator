@@ -6,11 +6,13 @@ const slackEvents = events.createSlackEventAdapter(process.env.SLACK_VERIFICATIO
 const port = process.env.PORT || 8000;
 
 const express = require('express');
+const { Pool } = require('pg');
 const bodyParser = require('body-parser');
 
 const app = express();
+const pool = new Pool();
 
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/slack/events', slackEvents.expressMiddleware());
