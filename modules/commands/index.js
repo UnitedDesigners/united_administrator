@@ -48,7 +48,6 @@ function playlists(req, res) {
     token: process.env.SLACK_OAUTH_TOKEN,
     channel: req.body.channel_id,
     text: 'Here are the United Designers\' Spotify playlists:<https://open.spotify.com/user/t00ny45/playlist/0BDL72PDgsplHxkuEmtmIf| ><https://open.spotify.com/user/thegeorgesumpster/playlist/1WOVXO4f974PG2FHREJUeS| ><https://open.spotify.com/user/123721037/playlist/7Jwmfyvu8uxhB3i0eEZ265| ><https://open.spotify.com/user/123721037/playlist/7EmbbFmb1qB6geRwaM1Nrs| >',
-    parse: 'full',
   }).then(() => {
     res.status(200).end();
   }).catch(err => console.error(err));
