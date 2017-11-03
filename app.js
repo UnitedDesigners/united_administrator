@@ -21,7 +21,7 @@ require('./interactive')(app, pool);
 
 require('./modules/applications').init(app, pool);
 require('./modules/welcome')(slackEvents);
-require('./modules/admin')(app);
+require('./modules/commands')(app);
 
 slackEvents.on('error', console.error);
 
